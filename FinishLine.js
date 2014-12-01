@@ -31,7 +31,7 @@ var FinishLine = function(options){
 FinishLine.prototype.logOptions = function(){
     console.log(this.options);
     return true;
-}
+};
 
 /**
  * Get options
@@ -39,7 +39,7 @@ FinishLine.prototype.logOptions = function(){
  */
 FinishLine.prototype.getOptions = function(){
     return this.options;
-}
+};
 
 /**
  * Check if modifier class has been added
@@ -47,7 +47,7 @@ FinishLine.prototype.getOptions = function(){
  */
 FinishLine.prototype.isActive = function(){
     return this.$node.hasClass(this.options.modifier);
-}
+};
 
 /**
  * Run to the finish line
@@ -61,8 +61,8 @@ FinishLine.prototype.run = function(){
     goalOffset   = this.options.goal.offset(),
     finishOffset = this.options.offset ? this.options.offset : 0,
     goNorth      = this.options.north ? true : false,
-    finishLine   = goNorth ? goalOffset.top : goalOffset.top + this.options.goal.outerHeight(),
-    finishLine   = goNorth ? finishLine - finishOffset : finishLine + finishOffset,
+    goal         = goNorth ? goalOffset.top : goalOffset.top + this.options.goal.outerHeight(),
+    finishLine   = goNorth ? goal - finishOffset : goal + finishOffset,
     hasWon       = goNorth ? winScroll <= finishLine : winScroll >= finishLine;
 
     if(hasWon){
@@ -73,7 +73,7 @@ FinishLine.prototype.run = function(){
         this.$node.removeClass(this.options.modifier);
         return false;
     }
-}
+};
 
 /**
  * Deactivate the state
@@ -82,6 +82,6 @@ FinishLine.prototype.run = function(){
 FinishLine.prototype.deactivate = function() {
     this.$node.removeClass(this.options.activeState);
     return true;
-}
+};
 
 module.exports = FinishLine;
