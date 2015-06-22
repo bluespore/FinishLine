@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 /**
  * FinishLine indicates a state change when the
@@ -6,6 +6,7 @@
  * the state change when passing back through the 'finish line'
  */
 var FinishLine = function(options){
+
     if(typeof options !== "object"){
         console.error('Finish Line options set incorrectly');
         return false;
@@ -16,12 +17,17 @@ var FinishLine = function(options){
      * Expected Params
      * @param {String} node - Selector of element to bind to
      * @param {String} modifier - modifier class name
-     * @param {jQuery Object} goal - jQuery object of goal
+     * @param {jQuery Object} startLine - jQuery object of startLine
+     * @param {jQuery Object} finishLine - jQuery object of finishLine
      * @param {Boolean} north - Want to register events scrolling up instead of the default of down
-     * @param {Integer} offset - How many pixels before the goal
+     * @param {Integer} startOffset - How many pixels before the start point
+     * @param {Integer} finishOffset - How many pixels before the finish point
+     * @param {String} orientation - left/right oriented
+     * @param {Integer} killWidth - minimum screen width to run
      */
     this.options = options;
-    this.$node = $(this.options.node);
+    this.$node = $( this.options.node );
+
 };
 
 /**
@@ -29,7 +35,7 @@ var FinishLine = function(options){
  * @return {Boolean}
  */
 FinishLine.prototype.logOptions = function(){
-    console.log(this.options);
+    console.log( this.options );
     return true;
 };
 
@@ -46,7 +52,7 @@ FinishLine.prototype.getOptions = function(){
  * @return {Boolean} hasClass result
  */
 FinishLine.prototype.isActive = function(){
-    return this.$node.hasClass(this.options.modifier);
+    return this.$node.hasClass( this.options.runningModifier );
 };
 
 /**
@@ -56,23 +62,68 @@ FinishLine.prototype.isActive = function(){
  * @return {Boolean}
  */
 FinishLine.prototype.run = function(){
-    var
-    winScroll    = $(window).scrollTop(),
-    goalOffset   = this.options.goal.offset(),
-    finishOffset = this.options.offset ? this.options.offset : 0,
-    goNorth      = this.options.north ? true : false,
-    goal         = goNorth ? goalOffset.top : goalOffset.top + this.options.goal.outerHeight(),
-    finishLine   = goNorth ? goal - finishOffset : goal + finishOffset,
-    hasWon       = goNorth ? winScroll <= finishLine : winScroll >= finishLine;
 
-    if(hasWon){
-        this.$node.addClass(this.options.modifier);
-        return true;
+    if( $(window).width() <= this.options.killWidth
+        || !this.$node.length > 0
+        || !this.options.startLine.length > 0
+        || !this.options.finishLine.length > 0){
+
+        this.deactivate();
+        return false;
+
+    }
+
+    var
+    winScroll     = $(window).scrollTop(),
+    north         = this.options.north ? true : false,
+
+    startLinePos  = this.options.startLine.offset(),
+    startOffset   = this.options.startOffset ? this.options.startOffset : 0,
+    startPoint    = north ? startLinePos.top : startLinePos.top + this.options.startLine.outerHeight(),
+    startTrigger  = north ? startPoint - startOffset : startPoint + startOffset,
+
+    finishLinePos = this.options.finishLine.offset(),
+    finishOffset  = this.options.finishOffset ? this.options.finishOffset : 0,
+    finishPoint   = north ? finishLinePos.top + this.options.finishLine.outerHeight() : finishLinePos.top,
+    finishTrigger = north ? finishPoint - finishOffset : finishPoint + finishOffset,
+
+    isRunning     = north ? winScroll <= startTrigger : winScroll >= startTrigger,
+    hasCompleted  = north ? winScroll <= (finishTrigger - this.options.finishLine.outerHeight()) : winScroll >= (finishTrigger - this.options.finishLine.outerHeight());
+
+    if( isRunning ){
+        this.$node.addClass( this.options.runningModifier );
+        $('body').addClass( this.options.bodyClass );
     }
     else{
-        this.$node.removeClass(this.options.modifier);
-        return false;
+        this.$node.removeClass( this.options.runningModifier );
+        $('body').removeClass( this.options.bodyClass );
     }
+
+    /**
+     * If has completed, set position absolute
+     * and set to a position just above where
+     * the finishLine sits.
+     */
+    if( hasCompleted ){
+
+        $('body').removeClass( this.options.bodyClass );
+
+        this
+        .$node
+        .removeClass( this.options.runningModifier )
+        .addClass( this.options.finishModifier )
+        .css({
+            'top': finishTrigger + parseInt(finishOffset)
+        });
+
+    }
+    else{
+        this
+        .$node
+        .attr('style', '')
+        .removeClass( this.options.finishModifier );
+    }
+
 };
 
 /**
@@ -80,7 +131,13 @@ FinishLine.prototype.run = function(){
  * @return {Boolean}
  */
 FinishLine.prototype.deactivate = function() {
-    this.$node.removeClass(this.options.activeState);
+    this
+    .$node
+    .removeClass( this.options.runningModifier )
+    .removeClass( this.options.finishModifier );
+
+    $('body').removeClass( this.options.bodyClass );
+
     return true;
 };
 
