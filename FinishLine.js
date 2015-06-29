@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 /**
  * FinishLine indicates a state change when the
@@ -74,21 +74,23 @@ FinishLine.prototype.run = function(){
     }
 
     var
-    winScroll     = $(window).scrollTop(),
-    north         = this.options.north ? true : false,
+    winScroll           = $(window).scrollTop(),
+    north               = this.options.north ? true : false,
 
-    startLinePos  = this.options.startLine.offset(),
-    startOffset   = this.options.startOffset ? this.options.startOffset : 0,
-    startPoint    = north ? startLinePos.top : startLinePos.top + this.options.startLine.outerHeight(),
-    startTrigger  = north ? startPoint - startOffset : startPoint + startOffset,
+    startLinePos        = this.options.startLine.offset(),
+    startOffset         = this.options.startOffset ? this.options.startOffset : 0,
+    startPoint          = north ? startLinePos.top : startLinePos.top + this.options.startLine.outerHeight(),
+    startTrigger        = north ? startPoint - startOffset : startPoint + startOffset,
 
-    finishLinePos = this.options.finishLine.offset(),
-    finishOffset  = this.options.finishOffset ? this.options.finishOffset : 0,
-    finishPoint   = north ? finishLinePos.top + this.options.finishLine.outerHeight() : finishLinePos.top,
-    finishTrigger = north ? finishPoint - finishOffset : finishPoint + finishOffset,
+    finishLinePos       = this.options.finishLine.offset(),
+    finishOffset        = this.options.finishOffset ? this.options.finishOffset : 0,
+    finishPoint         = north ? finishLinePos.top + this.options.finishLine.outerHeight() : finishLinePos.top,
+    finishTrigger       = north ? finishPoint - finishOffset : finishPoint + finishOffset,
 
-    isRunning     = north ? winScroll <= startTrigger : winScroll >= startTrigger,
-    hasCompleted  = north ? winScroll <= (finishTrigger - this.options.finishLine.outerHeight()) : winScroll >= (finishTrigger - this.options.finishLine.outerHeight());
+    absoluteDestination = north ? finishPoint + Math.abs(finishOffset) : finishPoint - Math.abs(finishOffset),
+
+    isRunning           = north ? winScroll <= startTrigger : winScroll >= startTrigger,
+    hasCompleted        = north ? winScroll <= absoluteDestination : winScroll >= absoluteDestination;
 
     if( isRunning ){
         this.$node.addClass( this.options.runningModifier );
@@ -113,7 +115,7 @@ FinishLine.prototype.run = function(){
         .removeClass( this.options.runningModifier )
         .addClass( this.options.finishModifier )
         .css({
-            'top': finishTrigger + parseInt(finishOffset)
+            'top': absoluteDestination
         });
 
     }
