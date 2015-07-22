@@ -48,11 +48,19 @@ FinishLine.prototype.getOptions = function(){
 };
 
 /**
- * Check if modifier class has been added
+ * Check if element currently in transit
  * @return {Boolean} hasClass result
  */
 FinishLine.prototype.isActive = function(){
     return this.$node.hasClass( this.options.runningModifier );
+};
+
+/**
+ * Check if element has completed running
+ * @return {Boolean} hasClass result
+ */
+FinishLine.prototype.hasFinished = function(){
+    return this.$node.hasClass( this.options.finishModifier );
 };
 
 /**
@@ -93,12 +101,16 @@ FinishLine.prototype.run = function(){
     hasCompleted        = north ? winScroll <= absoluteDestination : winScroll >= absoluteDestination;
 
     if( isRunning ){
-        this.$node.addClass( this.options.runningModifier );
-        $('body').addClass( this.options.bodyClass );
+        if( !this.isActive() ){
+            this.$node.addClass( this.options.runningModifier );
+            $('body').addClass( this.options.bodyClass );
+        }
     }
     else{
-        this.$node.removeClass( this.options.runningModifier );
-        $('body').removeClass( this.options.bodyClass );
+        if( this.isActive() ){
+            this.$node.removeClass( this.options.runningModifier );
+            $('body').removeClass( this.options.bodyClass );
+        }
     }
 
     /**
@@ -107,17 +119,18 @@ FinishLine.prototype.run = function(){
      * the finishLine sits.
      */
     if( hasCompleted ){
+        if( !this.hasFinished() ){
 
-        $('body').removeClass( this.options.bodyClass );
+            $('body').removeClass( this.options.bodyClass );
 
-        this
-        .$node
-        .removeClass( this.options.runningModifier )
-        .addClass( this.options.finishModifier )
-        .css({
-            'top': absoluteDestination
-        });
-
+            this
+            .$node
+            .removeClass( this.options.runningModifier )
+            .addClass( this.options.finishModifier )
+            .css({
+                'top': absoluteDestination
+            });
+        }
     }
     else{
         this
