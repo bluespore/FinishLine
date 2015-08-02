@@ -1,0 +1,28 @@
+{
+  "name": "finishline",
+  "version": "1.0.0",
+  "description": "A utility module for querying when elements should tether based on scroll position.",
+  "main": "FinishLine.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bluespore/FinishLine.git"
+  },
+  "keywords": [
+    "tether",
+    "affix",
+    "sidebar",
+    "scroll"
+  ],
+  "author": "Sean Bullock <sean@bluespore.com> (bluespore.com)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bluespore/FinishLine/issues"
+  },
+  "homepage": "https://github.com/bluespore/FinishLine#readme",
+  "dependencies": {
+    "jquery": "^1.11.3"
+  }
+}
